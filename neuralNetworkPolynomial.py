@@ -147,14 +147,16 @@ def learnNetwork(iterations, Xarg, Y):
             b3 = b3 - (learnRate * db3)
             
 
+        if i % 100 == 0:
+            print(i)
+            predictedX = np.linspace(-2, 1.5, 100)
+            predictedY = np.array([ predict(w1, b1, w2, b2, w3, b3,predX)[0] for predX in predictedX])
+            ax.clear()
+            ax.plot(predictedX, predictedY)
+            ax.plot(Xarg , Y)
 
-        predictedX = np.linspace(-2, 1.5, 100)
-        predictedY = np.array([ predict(w1, b1, w2, b2, w3, b3,predX)[0] for predX in predictedX])
-        ax.clear()
-        ax.plot(predictedX, predictedY)
-        ax.plot(Xarg , Y)
+            plt.pause(0.002)
 
-        plt.pause(0.002)
 
     return w1, b1, w2, b2
 
@@ -162,5 +164,5 @@ def learnNetwork(iterations, Xarg, Y):
         #     break
 Y = Y 
 X = X
-W1, b1, W2, b2 = learnNetwork(1000, X, Y)
+W1, b1, W2, b2 = learnNetwork(6000, X, Y)
 
