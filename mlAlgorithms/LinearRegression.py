@@ -52,3 +52,5 @@ Y = np.array([np.random.uniform(i + 10, i + 30) for i in range(100) for _ in ran
 
 lr = LinearRegression()
 lr.fit(X.T, Y)
+
+# examples based on https://github.com/AssemblyAI-Examples/Machine-Learning-From-Scratch/

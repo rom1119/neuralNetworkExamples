@@ -80,3 +80,5 @@ y_pred = lr.predict(X_test)
 
 # print(y_pred)
 print(accuracy(y_pred, Y_test))
+
+# examples based on https://github.com/AssemblyAI-Examples/Machine-Learning-From-Scratch/

@@ -23,8 +23,6 @@ class Node:
 
 class DecisionTree:
     
-    allPredictions = []
-    lastAccuracy = 0
 
     def __init__(self, min_samples_split=2, max_depth=100, n_features=None) -> None:
         self.min_samples_split = min_samples_split
@@ -32,10 +30,10 @@ class DecisionTree:
         self.n_features = n_features
         self.root = None
 
-        plt.ion()
+        # plt.ion()
 
-        fig, ax = plt.subplots(1,sharex=True)
-        self.ax = ax
+        # fig, ax = plt.subplots(1,sharex=True)
+        # self.ax = ax
 
     def _split(self, X_column, split_threshold):
         left_idx = np.argwhere(X_column <= split_threshold).flatten()
@@ -132,21 +130,6 @@ class DecisionTree:
     def predict(self, X):
         return np.array([self._treverse_tree(x, self.root) for x in X])
     
-    
-    # def showPlots(self, X, Y, currentIter):
-
-    #     if currentIter % 20 == 0 :
-    #     # self.ax.clear()
-    #         y_pred = self.predict(X)
-    #         thisLastAccuracy = accuracy(y_pred, Y)
-    #         self.allPredictions.append(thisLastAccuracy)
-    #         mean = np.mean(self.allPredictions) * 100
-    #         if mean > self.lastAccuracy:
-    #             self.lastAccuracy = mean
-    #         # self.ax.plot(X, (np.dot(X, self.weights) + self.bias))
-    #         self.ax.scatter(currentIter , self.lastAccuracy)
-    #         plt.pause(0.002)
-    
 
 
 
@@ -154,12 +137,14 @@ wine_data = datasets.load_breast_cancer()
 
 X_train, X_test, Y_train, Y_test = train_test_split(wine_data.data, wine_data.target, test_size=0.2, random_state=764)
 
-lr = DecisionTree()
-lr.fit(X_train, Y_train)
+lrDc = DecisionTree()
+# lrDc.fit(X_train, Y_train)
 
-y_pred = lr.predict(X_test)
+# y_pred = lrDc.predict(X_test)
 
 
 
 # print(Y_train)
-print(accuracy(y_pred, Y_test))
+# print(accuracy(y_pred, Y_test))
+
+# examples based on https://github.com/AssemblyAI-Examples/Machine-Learning-From-Scratch/
