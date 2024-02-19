@@ -1,4 +1,5 @@
 
+let FEN = 'r1k4r/p2nb1p1/2b4p/1p1n1p2/2PP4/3Q1NB1/1P3PPP/R5K1 b - - 0 19'
 
 var board = null
 var game = new Chess()
@@ -107,7 +108,7 @@ function makeRandomMoveFromAI () {
     if (possibleMoves.length === 0) return
 
     var preds = net.predict(X)
-    // console.log('preds', preds);
+    console.log('preds', preds);
 
     // var randomIdx = Math.floor(Math.random() * possibleMoves.length)
     var sumPredFloat = sumMatrix(preds)
@@ -132,11 +133,12 @@ function makeRandomMoveFromAI () {
     // console.log('sumY', sumY);
     // console.log('erro', sumY - sumPred);
 
-    // console.log('Y', Y);
-    // console.log('possibleMoves', possibleMoves);
-    // console.log('board', game.board());
-    // console.log('game.fen()', game.fen());
-    // console.log('ascii', game.ascii());
+    console.log('Y', Y);
+    console.log('X', X);
+    console.log('possibleMoves', possibleMoves);
+    console.log('board', game.board());
+    console.log('game.fen()', game.fen());
+    console.log('ascii', game.ascii());
 
     board.position(game.fen())
 

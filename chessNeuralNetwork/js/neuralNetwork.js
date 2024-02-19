@@ -31,7 +31,7 @@ class NeuralNetwork {
 
     constructor() {
 
-        var layerOne = this.initLayerRandom(100, 32)
+        var layerOne = this.initLayerRandom(100, 64)
         var layerTwo = this.initLayerRandom(200, 100)
         var layerThree = this.initLayerRandom(100, 200)
         var layerFour = this.initLayerRandom(64, 100)
@@ -75,7 +75,10 @@ class NeuralNetwork {
 
     forwardPropagation(X) {
         var res = {}
+        // console.log('this.w1', this.w1);
+        // console.log('X', X);
         var firstCalc = calculateLayer(this.w1, X, this.b1)
+        // console.log('firstCalc', firstCalc.z);
         res.z1 = firstCalc.z
         res.a1 = firstCalc.a
         
@@ -120,7 +123,8 @@ class NeuralNetwork {
         res.db2 = sumMatrix(dz2)
     
         var dz1 = calcMultiple(calcDotProducts(transpose(this.w2), dz2), (tanhDerrivMatrix(forwardResult.z1)))
-        res.dw1 = calcDotProducts(dz1, X)
+        
+        res.dw1 = calcDotProducts(dz1, transpose(X))
         res.db1 = sumMatrix(dz1)
 
         return res
@@ -163,7 +167,7 @@ class NeuralNetwork {
             this.b5 = calcMinus(this.b5, calcMultiple(backwardProps.db5, this.LEARNING_RATE))
 
             if (i % 100 == 0) {
-                console.log('EPOCH', i)
+                // console.log('EPOCH', i)
 
             }
         }
