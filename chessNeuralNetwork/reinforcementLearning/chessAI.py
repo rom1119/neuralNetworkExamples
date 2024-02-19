@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from params import *
 from utils.calcDeffence import DeffenceAlgorithm
 from utils.calcAttack import AttackAlgorithm
+import random
 
 import matplotlib.image as mpimg
 from time import sleep
@@ -14,15 +15,19 @@ from time import sleep
 
 class ChessGame():
 
-    history_moves = []
+    history_boards = []
+    selected_moves = []
     is_white_move = True
+    show_ui = True
 
-    def __init__(self) :
-        self.board = chess.Board(START_FEN)
+    def __init__(self, show_ui=False) :
+        self.board = chess.Board()
+        self.show_ui = show_ui
 
-        # plt.ion()
-        # fig, axs = plt.subplots(1,sharex=True)
-        # ax = axs
+        if show_ui:
+            plt.ion()
+            fig, axs = plt.subplots(1,sharex=True)
+            self.ax = axs
         # display.start(board.fen())
 
         self.default_board = np.array(default_board)
@@ -31,6 +36,34 @@ class ChessGame():
     # while not board.is_checkmate():
         
             
+    def tryShowUI(self):
+
+        if self.show_ui:
+            self.ax.clear()
+            svg_text = chess.svg.board(
+                self.board,
+                # fill=dict.fromkeys(board.attacks(chess.E4), "#cc0000cc"),
+                # arrows=[chess.svg.Arrow(chess.E4, chess.F6, color="#0000cccc")],
+                # squares=chess.SquareSet(chess.BB_DARK_SQUARES & chess.BB_FILE_B),
+                size=350,
+            ) 
+
+            # with open('example-board.svg', 'w') as f:
+            #     f.write(svg_text)
+
+            svg2png(bytestring=svg_text, write_to='board.png')
+            img = mpimg.imread('board.png')
+            imgplot = self.ax.imshow(img)
+            plt.pause(0.02)
+
+    def selectMove(self, field_val, figure_val, figure_idx):
+        move = {
+            'field_val': field_val,
+            'figure_val': figure_val,
+            'figure_idx': figure_idx,
+        }
+        self.selected_moves.append(move)
+
     def createX(self):
         X = []
         for row in self.default_board:
@@ -248,7 +281,7 @@ class ChessGame():
         values_for_target_field = {}
         last_moves = []
         last_moves_black = []
-        self.history_moves = []
+        self.history_boards = []
 
         last_used_figures = []
         last_used_figures_black = []
@@ -282,7 +315,7 @@ class ChessGame():
                     print('WIN WHITE')
                     return True
 
-            self.history_moves.append(self.createX())
+            self.history_boards.append(self.createX())
             
             # print(enemy_figure_indexes)
             # print('is_checkmate=' + board.is_checkmate)
@@ -356,7 +389,11 @@ class ChessGame():
             
             calc_att_minusd_def = attack_calc - deffence_calc
             print('============== attack_calc - deffence_calc ===================')
-            print (calc_att_minusd_def)        
+            print (calc_att_minusd_def)  
+            
+            calc_white = attack_figure - attack
+            print('============== attack_figure - attack ===================')
+            print (calc_white)        
 
             print('count legal_moves=' + str(len(list(legal_moves))))
             possible_moves = np.array(['o' for _ in range(64)])
@@ -387,7 +424,7 @@ class ChessGame():
                 # curr_val = attack_figure_val - (np.mean(attack_val)) - (figure_def_Val)
                 # curr_val = attack_figure_val - attack_calc[targetY][targetX] - figure_def_Val
                 if is_white_move:
-                    curr_val = attack_figure_val - (np.mean(attack_val)) - (figure_def_Val)
+                    curr_val = calc_white[targetY][targetX] - figure_def_Val
                 else:
                     curr_val = calc_def_minus_att[targetY][targetX] - figure_def_Val
 
@@ -397,12 +434,17 @@ class ChessGame():
 
                 if curr_val not in values_for_target_field.keys():
                     values_for_target_field[curr_val] = {}
+                    
+                if figure_def_Val not in values_for_target_field[curr_val].keys():
+                    values_for_target_field[curr_val][figure_def_Val] = []
 
                 legalMoveDict = {
                     'def_figure': figure_def,
                     'legal_move': legal_move,
+                    'figure_def_val': figure_def_Val,
+                    'curr_val': curr_val,
                 }
-                values_for_target_field[curr_val][figure_def_Val] = legalMoveDict
+                values_for_target_field[curr_val][figure_def_Val].append(legalMoveDict)
 
                 if curr_val > move_value:
                     move_value = curr_val
@@ -411,7 +453,7 @@ class ChessGame():
             print('==========================================possible_moves ==========================================' )
             print(possible_moves )
             print('is_checkmate=' + str(is_checkmate) )
-            print( values_for_target_field)
+            # print( values_for_target_field, end='\n\n')
 
             # for TEST 
             # if not is_white_move:
@@ -423,15 +465,15 @@ class ChessGame():
             #         }
             #     values_for_target_field[move_value][0.9] = legalMoveDict
 
-            print (move_values, sep=' ')
+            # print (move_values, sep=' ')
 
-            print( values_for_target_field)
+            # print( values_for_target_field, end='\n\n')
 
             most_val_moves = values_for_target_field[move_value]
 
             min_figure = np.min(list(most_val_moves.keys()))
             # min_figure = most_val_moves[min_figure]
-            print( 'most_val_moves', most_val_moves)
+            print( 'most_val_moves', most_val_moves, end='\n\n')
             print( 'most_val_moves', min_figure)
             print( 'most_val_moves.keys()', most_val_moves.keys())
             print( 'min_figure', min_figure)
@@ -439,26 +481,42 @@ class ChessGame():
 
 
             # legal_random_move = np.random.choice(most_val_moves)
-            legal_random_move = most_val_moves[min_figure]
+            legal_random_move_list = most_val_moves[min_figure]
+            legal_random_move_idx = random.randint(0, len(legal_random_move_list) - 1)
+            # print( 'len(legal_random_move_list)', len(legal_random_move_list))
+            # print( 'legal_random_move_idx', legal_random_move_idx)
+
+            legal_random_move = legal_random_move_list[legal_random_move_idx]
 
             legal_move_split = (legal_random_move['legal_move'][0] + legal_random_move['legal_move'][1], legal_random_move['legal_move'][2] + legal_random_move['legal_move'][3])
 
             most_quality_legal_move = legal_random_move
 
             av_moves = []
-            if is_white_move and last_moves.count(most_quality_legal_move) > 3:
-                for key in values_for_target_field.keys():
+            if is_white_move and last_moves.count(legal_random_move['legal_move']) > 3:
+                move_from_loop = False
+                for key in sorted(values_for_target_field.keys(), reverse=True):
+                    
                     v = values_for_target_field[key]
-                    for innerK in v.keys():
+                    for innerK in sorted(v.keys()):
 
-                        vk = v[innerK]['legal_move']
-                        if vk not in last_moves:
-                            av_moves.append(v)
+                        vk = v[innerK]
+                        for i, item in enumerate(vk):
 
-                if len(av_moves) > 0:
-                    legal_random_move_rand = np.random.choice(av_moves)
-                    legal_random_move = legal_random_move_rand[list(legal_random_move_rand.keys())[0]]
-                else :
+                            if item['legal_move'] not in last_moves:
+                                legal_random_move_idx = i
+                                legal_random_move = item
+                                av_moves.append(v)
+                                move_from_loop = True
+                                break
+                        if move_from_loop:
+                            break
+
+                    if move_from_loop:
+                        break
+                
+
+                if not move_from_loop:
                     legal_random_move = most_quality_legal_move
 
                 legal_move_split = (legal_random_move['legal_move'][0] + legal_random_move['legal_move'][1], legal_random_move['legal_move'][2] + legal_random_move['legal_move'][3])
@@ -467,19 +525,30 @@ class ChessGame():
                 print(legal_random_move)
 
 
-            elif not is_white_move and last_moves_black.count(most_quality_legal_move) > 3:
-                for key in values_for_target_field.keys():
+            elif not is_white_move and last_moves_black.count(legal_random_move['legal_move']) > 3:
+                move_from_loop = False
+                for key in sorted(values_for_target_field.keys(), reverse=True):
+                    
                     v = values_for_target_field[key]
-                    for innerK in v.keys():
+                    for innerK in sorted(v.keys()):
 
-                        vk = v[innerK]['legal_move']
-                        if vk not in last_moves:
-                            av_moves.append(v)
+                        vk = v[innerK]
+                        for i, item in enumerate(vk):
 
-                if len(av_moves) > 0:
-                    legal_random_move_rand = np.random.choice(av_moves)
-                    legal_random_move = legal_random_move_rand[list(legal_random_move_rand.keys())[0]]
-                else :
+                            if item['legal_move'] not in last_moves_black:
+                                legal_random_move_idx = i
+                                legal_random_move = item
+                                av_moves.append(v)
+                                move_from_loop = True
+                                break
+                        if move_from_loop:
+                            break
+
+                    if move_from_loop:
+                        break
+                
+
+                if not move_from_loop:
                     legal_random_move = most_quality_legal_move
 
                 legal_move_split = (legal_random_move['legal_move'][0] + legal_random_move['legal_move'][1], legal_random_move['legal_move'][2] + legal_random_move['legal_move'][3])
@@ -488,19 +557,24 @@ class ChessGame():
                 print(legal_random_move)
             # print(last_moves)
 
+            DEF_FIGURE = most_quality_legal_move['def_figure']
+
+            # print('last_moves', last_moves)
+
             if is_white_move:
-                last_moves.append(most_quality_legal_move)
+                self.selectMove(most_quality_legal_move['curr_val'], most_quality_legal_move['figure_def_val'], legal_random_move_idx)
+
+                last_moves.append(most_quality_legal_move['legal_move'])
                 if len(last_moves) > 30:
 
                     last_moves = last_moves[len(last_moves) - 30:]
                 
             else :
-                last_moves_black.append(most_quality_legal_move)
+                last_moves_black.append(most_quality_legal_move['legal_move'])
                 if len(last_moves_black) > 30:
 
                     last_moves_black = last_moves_black[len(last_moves_black) - 30:]
 
-            DEF_FIGURE = most_quality_legal_move['def_figure']
 
             column_move_difference = np.abs(LETTER_MAP.index(legal_move_split[1][0].upper()) - LETTER_MAP.index(legal_move_split[0][0].upper()))
 
@@ -529,25 +603,9 @@ class ChessGame():
             is_white_move = not is_white_move
    
             # display.update(board.fen())
-            # ax.clear()
-            # # ax.plot(predictedX, predictedY)
+            # ax.plot(predictedX, predictedY)
+            self.tryShowUI()
 
-            # svg_text = chess.svg.board(
-            #     board,
-            #     # fill=dict.fromkeys(board.attacks(chess.E4), "#cc0000cc"),
-            #     # arrows=[chess.svg.Arrow(chess.E4, chess.F6, color="#0000cccc")],
-            #     # squares=chess.SquareSet(chess.BB_DARK_SQUARES & chess.BB_FILE_B),
-            #     size=350,
-            # ) 
-
-            # with open('example-board.svg', 'w') as f:
-            #     f.write(svg_text)
-
-            # svg2png(bytestring=svg_text, write_to='board.png')
-            # img = mpimg.imread('board.png')
-            # imgplot = ax.imshow(img)
-
-            # plt.pause(0.02)
             # sleep(1)
         return False
     def initPromotionFigureAndCastling(self, legal_move_split, DEF_FIGURE, is_white_move, column_move_difference):

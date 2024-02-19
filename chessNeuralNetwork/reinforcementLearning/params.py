@@ -6,7 +6,7 @@ class POINTS_FIELD():
     FIGURE =  'FIGURE'
     ATTACK_FIGURE_VAL =  'ATTACK_FIGURE_VAL'
 
-NR_MOVES = 1
+NR_MOVES = 200
 LETTER_MAP = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 DIGIT_MAP = ['1', '2', '3', '4', '5', '6', '7', '8']
 DIGIT_MAP.reverse()
@@ -65,22 +65,11 @@ weight_of_field_white = np.array(weight_of_field_white) / 10
 weight_of_field_black = np.array(weight_of_field_black) / 10
 
 # START_FEN = '8/5k2/8/8/8/8/8/4K2R w - - 0 0'
-START_FEN = 'r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-# START_FEN = None
-
-# default_board = [
-# ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'], 
-# ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'], 
-# ['.', '.', '.', '.', '.', '.', '.', '.'], 
-# ['.', '.', '.', '.', '.', '.', '.', '.'], 
-# ['.', '.', '.', '.', '.', '.', '.', '.'], 
-# ['.', '.', '.', '.', '.', '.', '.', '.'], 
-# ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], 
-# ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-# ]
+# START_FEN = 'r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+START_FEN = None
 
 default_board = [
-['r', '.', '.', '.', 'k', 'b', 'n', 'r'], 
+['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'], 
 ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'], 
 ['.', '.', '.', '.', '.', '.', '.', '.'], 
 ['.', '.', '.', '.', '.', '.', '.', '.'], 
@@ -89,6 +78,17 @@ default_board = [
 ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], 
 ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 ]
+
+# default_board = [
+# ['r', '.', '.', '.', 'k', 'b', 'n', 'r'], 
+# ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'], 
+# ['.', '.', '.', '.', '.', '.', '.', '.'], 
+# ['.', '.', '.', '.', '.', '.', '.', '.'], 
+# ['.', '.', '.', '.', '.', '.', '.', '.'], 
+# ['.', '.', '.', '.', '.', '.', '.', '.'], 
+# ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'], 
+# ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+# ]
 
 
 
