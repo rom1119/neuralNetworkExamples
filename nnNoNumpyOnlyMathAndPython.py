@@ -162,7 +162,7 @@ def forwardPropagation(w1, b1, w2, b2, w3, b3, X):
     return z1, a1, z2, a2, z3, a3
 
 
-def backwardPropagation(w1, w2, w3, b1, b2, b3, z1, a1, z2, a2, z3, a3, Y, Ylist, X):
+def backwardPropagation(w1, w2, w3, b1, b2, b3, z1, a1, z2, a2, z3, a3, Y, X):
     # print('Y', Y)
     dz3 = calcMinus(a3, Y)
 
@@ -269,7 +269,7 @@ def learnNetwork(iterations, Xarg, Y):
         
         for idx, X in enumerate(Xarg):
             z1, a1, z2, a2, z3, a3 = forwardPropagation(w1, b1, w2, b2, w3, b3, X)
-            dw1, dw2, dw3, db1, db2, db3 = backwardPropagation(w1, w2, w3, b1, b2, b3, z1, a1, z2, a2, z3, a3, Y[idx], Y, X)
+            dw1, dw2, dw3, db1, db2, db3 = backwardPropagation(w1, w2, w3, b1, b2, b3, z1, a1, z2, a2, z3, a3, Y[idx], X)
 
             w1 = calcMinus(w1, calcMultiple(dw1, learnRate))
             w2 = calcMinus(w2, calcMultiple(dw2, learnRate))

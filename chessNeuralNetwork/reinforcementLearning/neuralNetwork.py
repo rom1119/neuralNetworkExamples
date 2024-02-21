@@ -25,19 +25,25 @@ class Net():
     def __init__(self):
 
         self.w1 = np.random.rand(100,64) / 10
-        self.b1 = np.random.rand(100,1) / 10
+        self.b1 = np.random.rand(100,64) / 10
 
         self.w2 = np.random.rand(200,100) / 10
-        self.b2 = np.random.rand(200,1) / 10
+        self.b2 = np.random.rand(200,64) / 10
         
         self.w3 = np.random.rand(100,200) / 10
-        self.b3 = np.random.rand(100,1) / 10
+        self.b3 = np.random.rand(100,64) / 10
+
+        self.w4 = np.random.rand(3,100) / 10
+        self.b4 = np.random.rand(3,64) / 10
         
-        self.w4 = np.random.rand(64,100) / 10
-        self.b4 = np.random.rand(64,1) / 10
+        self.w5 = np.random.rand(100,3) / 10
+        self.b5 = np.random.rand(100,1) / 10
         
-        self.w5 = np.random.rand(64,64) / 10
-        self.b5 = np.random.rand(64,1) / 10
+        self.w6 = np.random.rand(1,100) / 10
+        self.b6 = np.random.rand(1,1) / 10
+        
+        self.w7 = np.random.rand(1,1) / 10
+        self.b7 = np.random.rand(1,64) / 10
         # b1 = np.ones((3,1))
         # b2 = np.ones((2,1))
         # b3 = np.ones((1,1))
@@ -70,27 +76,44 @@ class Net():
 
         self.z3 = self.w3.dot(self.a2) + self.b3
         self.a3 = np.tanh(self.z3)
-        
+
         self.z4 = self.w4.dot(self.a3) + self.b4
         self.a4 = np.tanh(self.z4)
         
         self.z5 = self.w5.dot(self.a4) + self.b5
         self.a5 = np.tanh(self.z5)
+        
+        self.z6 = self.w6.dot(self.a5) + self.b6
+        self.a6 = np.tanh(self.z6)
+        
+        self.z7 = self.w7.dot(self.a6) + self.b7
+        self.a7 = self.z7
 
         # print('z1', z1)
 
     def backwardPropagation(self, Y, X):
         # print('a2', a2)
         # print('Y', Y)
-        dz5 = (self.a5 - Y)
+        print(X)
+        print(Y)
+        print(self.a7)
+        dz7 = (self.a7 - Y)
 
-        dw5 = dz5 * self.a4
-        db5 = np.sum(dz5)
+        dw7 = dz7 * self.a6
+        db7 = np.sum(dz7)
         # print('dz3', dz3)
         # print('Y', Y)
         # print('dw3', dw3)
 
         # dz2 = w3.T.dot(dz3) * (1 - (np.tanh(z2) ** 2))
+        dz6 = self.w7.T.dot(dz7) * (1 - (np.tanh(self.z6) ** 2))
+        dw6 = dz6.dot(self.a5.T)
+        db6 = np.sum(dz6)
+
+        dz5 = self.w6.T.dot(dz6) * (1 - (np.tanh(self.z5) ** 2))
+        dw5 = dz5.dot(self.a4.T)
+        db5 = np.sum(dz5)
+
         dz4 = self.w5.T.dot(dz5) * (1 - (np.tanh(self.z4) ** 2))
         dw4 = dz4.dot(self.a3.T)
         db4 = np.sum(dz4)
@@ -115,7 +138,7 @@ class Net():
         # print('db1', db1)
         # dz2 = 
         # print(z1)
-
+        return True
 
         return dw1, dw2, dw3, dw4, dw5, db1, db2, db3, db4, db5
 
@@ -127,10 +150,10 @@ class Net():
 
         learnRate = 0.01
 
-        for i in range(200):
+        for i in range(1000):
             
             for idx, X in enumerate(Xarg):
-                self.forwardPropagation(Xarg)
+                self.forwardPropagation(X)
                 dw1, dw2, dw3, dw4, dw5, db1, db2, db3, db4, db5 = self.backwardPropagation( Y[idx], X)
                 dw1 = dw1.reshape(100, 1)
                 # print(dw1)
@@ -149,9 +172,8 @@ class Net():
                 
 
 
-                if i % 100 == 0:
-                    err = (np.sum(Y) - np.sum(self.a5) )
-                print('err=' + str(err))
+            if i % 100 == 0:
+                print('i=' + str(i))
                 # print(i)
                 # predictedX = np.linspace(-2, 1.5, 100)
                 # predictedY = np.array([ predict(w1, b1, w2, b2, w3, b3,predX)[0] for predX in predictedX])
@@ -169,10 +191,13 @@ class Net():
                 
 # start_time = time.time()
 
+def accuracy(y_pred, y_test):
+    return np.sum(y_pred == y_test) / len(y_test)
+# if sys.argv[1] == 'test':
+#     x = data.X
+#     y = data.Y
 
-if sys.argv[1] == 'test':
-    x = data.X
-    y = data.Y
+# print(accuracy(y_pred, Y_test))
 # else:
 #     x = sys.argv[1]
 #     x = ast.literal_eval(x)
@@ -184,10 +209,10 @@ if sys.argv[1] == 'test':
 # # print( [5] )
 # # print('y arg ', y )
 
-X = np.array(x)
-Y = np.array(y)
-print('X arg ', len(X) )
-print('y arg ', len(Y) )
+# X = np.array(x)
+# Y = np.array(y)
+# print('X arg ', len(X) )
+# print('y arg ', len(Y) )
 
 
 # net = Net()
@@ -195,7 +220,7 @@ print('y arg ', len(Y) )
 # net.learnNetwork(X, Y)
 
 # joblib.dump(net, "./model/chess_model.joblib")
-dt = joblib.load("./model/chess_model.joblib")
+# dt = joblib.load("./model/chess_model.joblib")
 # dt.learnNetwork(X, Y)
 
 # preds = net.predict(X)
@@ -204,7 +229,7 @@ dt = joblib.load("./model/chess_model.joblib")
 # # print(np.array2string(preds, separator=','))
 # print('preds ', preds )
 # print('Y', Y )
-print('dt', dt.a5 )
+# print('dt', dt.a5 )
 
 # import chess.engine
 

@@ -6,7 +6,7 @@ class POINTS_FIELD():
     FIGURE =  'FIGURE'
     ATTACK_FIGURE_VAL =  'ATTACK_FIGURE_VAL'
 
-NR_MOVES = 200
+NR_MOVES = 5
 LETTER_MAP = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 DIGIT_MAP = ['1', '2', '3', '4', '5', '6', '7', '8']
 DIGIT_MAP.reverse()

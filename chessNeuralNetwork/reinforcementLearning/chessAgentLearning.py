@@ -51,44 +51,53 @@ def sigmoid(x):
 # Klasa agenta
 class Agent:
     def __init__(self):
+        # joblib.dump(net, "./model/chess_model.joblib")
+        dtNet = None
+        try:
+            dtNet = joblib.load("./model/chess_model.joblib")
+            self.nn = dtNet
+        except: 
+            print('not joblib model found')
         self.nn = Net()
-        self.epsilon = 0.1  # Parametr epsilon-greedy
+        # print(dtNet)
+        # dt.learnNetwork(X, Y)
+        print(self.nn.a5[:5])
+        # joblib.dump(self.nn, "./model/chess_model.joblib")
 
-    def select_action(self, state):
-        # Epsilon-greedy exploration
-        if np.random.rand() < self.epsilon:
-            empty_cells = np.where(state == 0)[0]
-            return np.random.choice(empty_cells)
-        else:
-            q_values = self.nn.forward(state)
-            return np.argmax(q_values)
 
-# Funkcja grająca w kółko i krzyżyk
+    def play_me(self, state):
+
+        return self.nn.forward(state)
+
 def play_game(agent):
     chess = ChessGame()
 
+    play_me = True
     while True:
-        action = agent.select_action(state)
-        state[action] = current_player
-
-        if check_win(state, current_player):
-            return current_player
-
-        if np.all(state != 0):
-            return 0  # Remis
-
-        current_player = -current_player
+        action = agent.select_move(play_me.createX())
+        # state[action] = current_player
+        if play_me:
+            me_result = chess.play_me(action)
+            if not me_result:
+                return 0
+        else:
+            enemy_result = chess.play_enemy()
+            if not enemy_result:
+                return 1
+        
+        play_me = not play_me
+            
 
 # Funkcja sprawdzająca, czy nastąpiła wygrana
-def check_win(state, player):
-    win_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-    for comb in win_combinations:
-        if all(state[i] == player for i in comb):
-            return True
-    return False
+# def check_win(state, player):
+#     win_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+#     for comb in win_combinations:
+#         if all(state[i] == player for i in comb):
+#             return True
+#     return False
 
-# Funkcja trenująca agenta za pomocą metody Q-learning
-def train_agent(agent, num_episodes, learning_rate=0.1, discount_factor=0.99):
+def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
+
     for episode in range(num_episodes):
         chessGame = ChessGame()
         states_sequence = []
@@ -96,49 +105,53 @@ def train_agent(agent, num_episodes, learning_rate=0.1, discount_factor=0.99):
         rewards_sequence = []
 
         while True:
-            states_sequence.append(state.copy())
+            # states_sequence.append(state.copy())
 
-            action = agent.select_action(state)
-            actions_sequence.append(action)
+            # action = agent.select_move(state)
+            # actions_sequence.append(action)
 
-            next_state = state.copy()
-            next_state[action] = 1
+            # next_state = state.copy()
+            # next_state[action] = 1
             reward = 0
 
-            if check_win(next_state, 1):
+            game_result = chessGame.auto_play_chess()
+
+
+            if game_result:
                 reward = 1
-            elif np.all(next_state != 0):
+            else:
                 reward = 0
 
             rewards_sequence.append(reward)
 
-            # Aktualizacja wartości Q
-            if len(states_sequence) > 1:
-                prev_state = states_sequence[-2]
-                prev_action = actions_sequence[-2]
-                q_values = agent.nn.forward(prev_state)
-                max_next_q = np.max(agent.nn.forward(next_state))
-                q_values[prev_action] += learning_rate * (reward + discount_factor * max_next_q - q_values[prev_action])
-                agent.nn.train(prev_state, q_values)
+            if game_result:
+                # prev_state = states_sequence[-2]
+                # prev_action = actions_sequence[-2]
+                # q_values = agent.nn.forward(prev_state)
+                # max_next_q = np.max(agent.nn.forward(next_state))
+                # q_values[prev_action] += learning_rate * (reward + discount_factor * max_next_q - q_values[prev_action])
+                X = np.array(chessGame.history_boards) / 10
+                Y = np.array(chessGame.selected_moves) / 10
+                agent.nn.learnNetwork(X, Y)
 
-            state = next_state
+            # state = next_state
 
             if reward != 0:
                 break
-        joblib.dump(agent.nn.best_estimator_, "./model/chess_model.joblib")
+        joblib.dump(agent.nn, "./model/chess_model.joblib")
 
 # Przykładowe użycie
 if __name__ == "__main__":
     agent = Agent()
-    num_episodes = 10000
+    num_episodes = 100
     train_agent(agent, num_episodes)
 
-    # Testowanie agenta
-    results = {1: 0, -1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
-    num_tests = 1000
-    for _ in range(num_tests):
-        result = play_game(agent)
-        results[result] += 1
+    # # Testowanie agenta
+    # results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
+    # num_tests = 100
+    # for _ in range(num_tests):
+    #     result = play_game(agent)
+    #     results[result] += 1
 
-    print(f"Wyniki po {num_tests} grach:")
+    # print(f"Wyniki po {num_tests} grach:")
     # print(f"Wygrane:
