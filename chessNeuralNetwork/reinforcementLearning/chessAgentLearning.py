@@ -57,11 +57,11 @@ class Agent:
             dtNet = joblib.load("./model/chess_model.joblib")
             self.nn = dtNet
         except: 
+            self.nn = Net()
             print('not joblib model found')
-        self.nn = Net()
         # print(dtNet)
         # dt.learnNetwork(X, Y)
-        print(self.nn.a5[:5])
+        # print(self.nn.a5[:5])
         # joblib.dump(self.nn, "./model/chess_model.joblib")
 
 
@@ -99,7 +99,6 @@ def play_game(agent):
 def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 
     for episode in range(num_episodes):
-        chessGame = ChessGame()
         states_sequence = []
         actions_sequence = []
         rewards_sequence = []
@@ -113,6 +112,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
             # next_state = state.copy()
             # next_state[action] = 1
             reward = 0
+            chessGame = ChessGame()
 
             game_result = chessGame.auto_play_chess()
 
@@ -130,8 +130,14 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
                 # q_values = agent.nn.forward(prev_state)
                 # max_next_q = np.max(agent.nn.forward(next_state))
                 # q_values[prev_action] += learning_rate * (reward + discount_factor * max_next_q - q_values[prev_action])
-                X = np.array(chessGame.history_boards) / 10
-                Y = np.array(chessGame.selected_moves) / 10
+                X = np.array(chessGame.history_boards)
+                Y = np.array(chessGame.selected_moves)
+
+                # print(X.shape)
+                # print(Y.shape)
+                # for i in range(len(X)):
+                #     print(Y[i])
+                #     print(X[i])
                 agent.nn.learnNetwork(X, Y)
 
             # state = next_state

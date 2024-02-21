@@ -58,8 +58,7 @@ class ChessGame():
             imgplot = self.ax.imshow(img)
             plt.pause(0.02)
 
-    # def selectMove(self, field_val, figure_val, figure_idx, select_move_coords, board_points):
-    def selectMove(self, field_val, figure_val, figure_idx,):
+    def selectMove(self, field_val, figure_val, figure_idx):
         move = {
             'field_val': field_val,
             'figure_val': figure_val,
@@ -93,23 +92,23 @@ class ChessGame():
                     val = 0
                 else:
                     val = FIGURE_VALUES_FOR_NET_ENEMY[cell.lower()]
-                X.append([val])
+                X.append(val)
             
-        return X
+        return [X]
 
     def move(self, currPos, targetPos, board):
 
         currentPointer = (LETTER_MAP.index(currPos[0].upper()), DIGIT_MAP.index(currPos[1]))
 
-        currentVal = board[currentPointer[1]][currentPointer[0]]
+        currentVal = self.default_board[currentPointer[1]][currentPointer[0]]
         
         targetPointer = (LETTER_MAP.index(targetPos[0].upper()), DIGIT_MAP.index((targetPos[1])))
-        targetVal = board[targetPointer[1]][targetPointer[0]]
+        targetVal = self.default_board[targetPointer[1]][targetPointer[0]]
 
-        board[currentPointer[1]][currentPointer[0]] = '.'
-        board[targetPointer[1]][targetPointer[0]] = currentVal
+        self.default_board[currentPointer[1]][currentPointer[0]] = '.'
+        self.default_board[targetPointer[1]][targetPointer[0]] = currentVal
 
-        return board
+        return self.default_board
 
     def generate_clear_board_points(self): 
         new_board = {}
@@ -128,7 +127,7 @@ class ChessGame():
         return  new_board
 
     def generate_board_points_and_clear_board_field(self, board_points, enemy_figure_indexes, my_figure_indexes): 
-        board = default_board
+        board = self.default_board
         if self.is_white_move:
 
             for idx_digit, digit in enumerate(DIGIT_MAP):
@@ -212,10 +211,6 @@ class ChessGame():
         # print(default_board, end='\n\n')
         # print('DEF_FIGURE', DEF_FIGURE)
 
-
-            # print('new_figure', self.default_board)
-
-            # return True
         self.initPromotionFigureAndCastling(legal_move_split, DEF_FIGURE, column_move_difference)
 
         self.is_white_move = not self.is_white_move
@@ -295,7 +290,6 @@ class ChessGame():
                     print('WIN WHITE')
                     return True
 
-            self.history_boards.append(self.createX())
 
             generated_board_points, possible_moves, move_value, values_for_target_field = self.prepare_matrix_points(legal_moves)
             
@@ -407,43 +401,46 @@ class ChessGame():
         # print (attack_figure, sep=' ')
         # print('============== deffence_figure ===================')
         # print (deffence_figure, sep=' ')
-        print('============== attack ===================')
-        print (attack, sep=' ')
-        print('============== deffence ===================')
-        print (deffence, sep=' ')
+        # print('============== attack ===================')
+        # print (attack, sep=' ')
+        # print('============== deffence ===================')
+        # print (deffence, sep=' ')
         
         attack_calc = attack_figure + attack
         deffence_calc = deffence_figure + deffence
-        print('============== attack_figure + attack ===================')
-        print (attack_calc)
-        print('============== deffence_figure + deffence ===================')
-        print (deffence_calc)
+        # print('============== attack_figure + attack ===================')
+        # print (attack_calc)
+        # print('============== deffence_figure + deffence ===================')
+        # print (deffence_calc)
 
         calc_def_minus_att =  deffence_calc - attack_calc 
-        print('============== deffence_calc - attack_calc ===================')
-        print (calc_def_minus_att)
+        # print('============== deffence_calc - attack_calc ===================')
+        # print (calc_def_minus_att)
         
         calc_att_minusd_def = attack_calc - deffence_calc
-        print('============== attack_calc - deffence_calc ===================')
-        print (calc_att_minusd_def)  
+        # print('============== attack_calc - deffence_calc ===================')
+        # print (calc_att_minusd_def)  
         
         calc_white = attack_figure - attack
-        print('============== attack_figure - attack ===================')
-        print (calc_white)        
+        # print('============== attack_figure - attack ===================')
+        # print (calc_white)        
 
         print('count legal_moves=' + str(len(list(legal_moves))))
 
-        possible_moves = np.array([0.0 for _ in range(64)])
+        possible_moves = np.array(['o' for _ in range(64)])
         possible_moves = possible_moves.reshape(8,8)
         values_for_target_field = {}
 
 
+        # print(f'generated_board_points {generated_board_points} ')
         for legal_move in legal_moves:
             legal_move = str(legal_move)
 
             # attack_figure_val = generated_board_points[legal_move[3]][legal_move[2].upper()]['attack_figure_value']
             # deff_val = generated_board_points[legal_move[3]][legal_move[2].upper()]['defence_value']
             # attack_val = generated_board_points[legal_move[3]][legal_move[2].upper()]['attack_value']
+            # print(f'legal_move {legal_move} ')
+
             figure_def = generated_board_points[legal_move[1]][legal_move[0].upper()]['figure_deffence']
 
             targetY = DIGIT_MAP.index(legal_move[3])
@@ -457,12 +454,8 @@ class ChessGame():
             # curr_val = attack_figure_val - attack_calc[targetY][targetX] - figure_def_Val
             if self.is_white_move:
                 curr_val = calc_white[targetY][targetX] - figure_def_Val
-                possible_moves[targetY][targetX] = curr_val
-
             else:
                 curr_val = calc_def_minus_att[targetY][targetX] - figure_def_Val
-
-            print('curr_val=' + str(curr_val) )
 
         # =======================================================
             
@@ -515,12 +508,11 @@ class ChessGame():
 
         min_figure = np.min(list(most_val_moves.keys()))
         # min_figure = most_val_moves[min_figure]
-        print( 'values_for_target_field', values_for_target_field, end='\n\n')
         print( 'most_val_moves', most_val_moves, end='\n\n')
         print( 'most_val_moves', min_figure)
         print( 'most_val_moves.keys()', most_val_moves.keys())
         print( 'min_figure', min_figure)
-        print( 'min_figure', most_val_moves[min_figure])
+        # print( 'min_figure', most_val_moves[min_figure])
 
 
         # legal_random_move = np.random.choice(most_val_moves)
@@ -543,6 +535,7 @@ class ChessGame():
         # print('last_moves', last_moves)
 
         if self.is_white_move:
+            self.history_boards.append(self.createX())
             self.selectMove(most_quality_legal_move['curr_val'], most_quality_legal_move['figure_def_val'], legal_random_move_idx)
 
             last_moves.append(most_quality_legal_move['legal_move'])
@@ -666,10 +659,10 @@ class ChessGame():
 # sleep(100)
     
 
-game = ChessGame(True)
+# game = ChessGame(True)
 
-game.auto_play_chess()
-print(game.default_board, end='\n\n')
+# game.auto_play_chess()
+# print(game.default_board, end='\n\n')
 
 # print(game.board.piece_at(16))
 # for el in game.board.pieces():
