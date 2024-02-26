@@ -156,7 +156,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 # Przykładowe użycie
 if __name__ == "__main__":
     agent = Agent()
-    num_episodes = 2
+    num_episodes = 2000000
     train_agent(agent, num_episodes)
 
     # # Testowanie agenta
