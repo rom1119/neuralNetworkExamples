@@ -21,6 +21,7 @@ class ChessGame():
     selected_moves = []
     is_white_move = True
     show_ui = True
+    nr_moves_white = 0
 
     def __init__(self, show_ui=False) :
         self.board = chess.Board()
@@ -56,15 +57,19 @@ class ChessGame():
             svg2png(bytestring=svg_text, write_to='board.png')
             img = mpimg.imread('board.png')
             imgplot = self.ax.imshow(img)
-            plt.pause(0.02)
+            plt.pause(0.002)
 
     def selectMove(self, field_val, figure_val, figure_idx):
-        move = {
-            'field_val': field_val,
-            'figure_val': figure_val,
-            'figure_idx': figure_idx,
-        }
-        move = [field_val, figure_val, figure_idx]
+        field_val = field_val
+        figure_val = figure_val
+        figure_idx = figure_idx
+        # move = {
+        #     'field_val': field_val + np.random.uniform(0.01, 0.09),
+        #     'figure_val': figure_val + np.random.uniform(0.01, 0.09),
+        #     'figure_idx': figure_idx + np.random.uniform(0.01, 0.09),
+        # }
+        move = np.array([field_val, figure_val, figure_idx])
+        # move = field_val
 
         Y = []
         # for idx_row, row in enumerate(board_points):
@@ -78,7 +83,11 @@ class ChessGame():
         #         else:
         #             val = FIGURE_VALUES_FOR_NET_ENEMY[cell.lower()]
         #         Y.append([val])
-        self.selected_moves.append(move)
+        print(f"move={move}")
+        moveNew = move + len(self.selected_moves) + 1
+        print(f"moveNew={moveNew}")
+
+        self.selected_moves.append(moveNew)
 
     def createX(self):
         X = []
@@ -93,8 +102,16 @@ class ChessGame():
                 else:
                     val = FIGURE_VALUES_FOR_NET_ENEMY[cell.lower()]
                 X.append(val)
-            
-        return [X]
+
+        li = np.array(X) / 150
+        res = 0
+        for ids, x in enumerate(li):
+            idx = ids + 1
+            v = (0.000001 * idx) + (x * idx)
+            # print(f"idx={idx} x={x} (0.0001 * idx)={(0.000001 * idx)} v={v}")
+            res += v
+        # print(f"x = {res}")
+        return res
 
     def move(self, currPos, targetPos, board):
 
@@ -277,12 +294,16 @@ class ChessGame():
         last_moves = []
         last_moves_black = []
         self.history_boards = []
+        self.selected_moves = []
 
         last_used_figures = []
         last_used_figures_black = []
         for _ in range(NR_MOVES):
             legal_moves = list(self.board.legal_moves)
             if len(list(legal_moves)) == 0:
+                print('i=' + str(_))
+
+                print(self.board, end='\n\n')
                 if self.is_white_move:
                     print('WIN BLACK')
                     return False
@@ -301,19 +322,18 @@ class ChessGame():
 
             column_move_difference = np.abs(LETTER_MAP.index(legal_move_split[1][0].upper()) - LETTER_MAP.index(legal_move_split[0][0].upper()))
 
-            print('column_move_difference=' + str(column_move_difference))
-            print('move_value=' + str(move_value))
-            print('i=' + str(_))
+            # print('column_move_difference=' + str(column_move_difference))
+            # print('move_value=' + str(move_value))
+            # print('i=' + str(_))
             # print('quality_me=' + str(quality_me))
             # print('quality_enemy=' + str(quality_enemy))
             # print('move_value=' + str(move_value))
             # print('is_white_move=' + str(is_white_move))
-            print(legal_move_split[0] + ' -> ' + legal_move_split[1])
+            # print(legal_move_split[0] + ' -> ' + legal_move_split[1])
 
             self.default_board = self.move(legal_move_split[0], legal_move_split[1], default_board)
             self.board.push_san(most_quality_legal_move['legal_move'] )
 
-            print(self.board, end='\n\n')
             # print(default_board, end='\n\n')
             # print('DEF_FIGURE', DEF_FIGURE)
 
@@ -326,6 +346,10 @@ class ChessGame():
             self.tryShowUI()
 
             # sleep(1)
+        print('i=' + str(_))
+
+        print(self.board, end='\n\n')
+
         return False
     
     def prepare_matrix_points(self, legal_moves):
@@ -396,7 +420,7 @@ class ChessGame():
         deffence_figure = np.array(deffence_figure)
 
 
-        print('is_white_move=' + str(self.is_white_move))
+        # print('is_white_move=' + str(self.is_white_move))
         # print('============== attack_figure ===================')
         # print (attack_figure, sep=' ')
         # print('============== deffence_figure ===================')
@@ -425,7 +449,7 @@ class ChessGame():
         # print('============== attack_figure - attack ===================')
         # print (calc_white)        
 
-        print('count legal_moves=' + str(len(list(legal_moves))))
+        # print('count legal_moves=' + str(len(list(legal_moves))))
 
         possible_moves = np.array(['o' for _ in range(64)])
         possible_moves = possible_moves.reshape(8,8)
@@ -485,9 +509,9 @@ class ChessGame():
 
 
         is_checkmate = self.board.is_checkmate()
-        print('==========================================possible_moves ==========================================' )
-        print(possible_moves )
-        print('is_checkmate=' + str(is_checkmate) )
+        # print('==========================================possible_moves ==========================================' )
+        # print(possible_moves )
+        # print('is_checkmate=' + str(is_checkmate) )
         # print( values_for_target_field, end='\n\n')
 
         # for TEST 
@@ -506,12 +530,21 @@ class ChessGame():
 
         most_val_moves = values_for_target_field[move_value]
 
-        min_figure = np.min(list(most_val_moves.keys()))
+        if self.is_white_move:
+
+            if self.nr_moves_white % 5 == 0:
+                min_figure = np.random.choice(list(most_val_moves.keys()))
+            else:
+                min_figure = np.min(list(most_val_moves.keys()))
+            
+            self.nr_moves_white = self.nr_moves_white + 1
+        else:
+            min_figure = np.min(list(most_val_moves.keys()))
         # min_figure = most_val_moves[min_figure]
-        print( 'most_val_moves', most_val_moves, end='\n\n')
-        print( 'most_val_moves', min_figure)
-        print( 'most_val_moves.keys()', most_val_moves.keys())
-        print( 'min_figure', min_figure)
+        # print( 'most_val_moves', most_val_moves, end='\n\n')
+        # print( 'most_val_moves', min_figure)
+        # print( 'most_val_moves.keys()', most_val_moves.keys())
+        # print( 'min_figure', min_figure)
         # print( 'min_figure', most_val_moves[min_figure])
 
 
@@ -662,7 +695,7 @@ class ChessGame():
 # game = ChessGame(True)
 
 # game.auto_play_chess()
-# print(game.default_board, end='\n\n')
+# print(np.array(game.default_board), end='\n\n')
 
 # print(game.board.piece_at(16))
 # for el in game.board.pieces():

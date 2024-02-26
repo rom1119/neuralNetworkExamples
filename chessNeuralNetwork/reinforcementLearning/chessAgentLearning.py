@@ -2,6 +2,7 @@ import numpy as np
 from neuralNetwork import Net
 from chessAI import ChessGame
 import joblib
+import time
 
 # Funkcja aktywacji Sigmoid
 def sigmoid(x):
@@ -52,14 +53,14 @@ def sigmoid(x):
 class Agent:
     def __init__(self):
         # joblib.dump(net, "./model/chess_model.joblib")
-        dtNet = None
-        try:
-            dtNet = joblib.load("./model/chess_model.joblib")
-            self.nn = dtNet
-        except: 
-            self.nn = Net()
-            print('not joblib model found')
+        # dtNet = None
+        # try:
+        #     dtNet = joblib.load("./model/chess_model.joblib")
+        #     self.nn = dtNet
+        # except: 
         # print(dtNet)
+        self.nn = Net()
+        # print('not joblib model found')
         # dt.learnNetwork(X, Y)
         # print(self.nn.a5[:5])
         # joblib.dump(self.nn, "./model/chess_model.joblib")
@@ -99,8 +100,7 @@ def play_game(agent):
 def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 
     for episode in range(num_episodes):
-        states_sequence = []
-        actions_sequence = []
+
         rewards_sequence = []
 
         while True:
@@ -115,7 +115,6 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
             chessGame = ChessGame()
 
             game_result = chessGame.auto_play_chess()
-
 
             if game_result:
                 reward = 1
@@ -138,18 +137,26 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
                 # for i in range(len(X)):
                 #     print(Y[i])
                 #     print(X[i])
+                # X = np.array([20, 40, 10, 55, 80])
+                # Y = np.array([[40, 80, 20], [20, 30, 20], [50, 90, 10], [10, 10, 10], [40, 80, 20]])
+                start_time = time.time()
+
                 agent.nn.learnNetwork(X, Y)
+
+                print("--- %s seconds ---" % (time.time() - start_time))
+
+                # joblib.dump(agent.nn, "./model/chess_model.joblib")
 
             # state = next_state
 
             if reward != 0:
                 break
-        joblib.dump(agent.nn, "./model/chess_model.joblib")
+        # joblib.dump(agent.nn, "./model/chess_model.joblib")
 
 # Przykładowe użycie
 if __name__ == "__main__":
     agent = Agent()
-    num_episodes = 100
+    num_episodes = 2
     train_agent(agent, num_episodes)
 
     # # Testowanie agenta
