@@ -141,6 +141,7 @@ class Net:
             # self.output_weights = params['output_weights']
             # self.output_bias = params['output_bias']
             self.keras_model = keras.models.load_model("model/chess_model_not_norm.model")
+            # self.keras_model = keras.models.load_model("model/test.model")
             pass
         except: 
             print('not  model params found')
@@ -155,6 +156,7 @@ class Net:
 
         # joblib.dump(params, "./model/chess_model.joblib")
 
+        # self.keras_model.save("model/test.model")
         self.keras_model.save("model/chess_model_not_norm.model")
 
         
@@ -166,13 +168,14 @@ class Net:
 
     def feedforward(self, X):
         # Propagacja sygnału w przód
-        hidden_output = X
-        self.hidden_outputs = [hidden_output]  # Przechowywanie wyników na warstwach ukrytych
-        for i in range(len(self.hidden_weights)):
-            hidden_output = self.tanh(np.dot(hidden_output, self.hidden_weights[i]) + self.hidden_biases[i])
-            self.hidden_outputs.append(hidden_output)
-        output = np.dot(hidden_output, self.output_weights) + self.output_bias
-        return output
+        # hidden_output = X
+        # self.hidden_outputs = [hidden_output]  # Przechowywanie wyników na warstwach ukrytych
+        # for i in range(len(self.hidden_weights)):
+        #     hidden_output = self.tanh(np.dot(hidden_output, self.hidden_weights[i]) + self.hidden_biases[i])
+        #     self.hidden_outputs.append(hidden_output)
+        # output = np.dot(hidden_output, self.output_weights) + self.output_bias
+        # return output
+        return self.keras_model.predict(X.reshape((-1, 1)))
 
     def backpropagation(self, X, y, output):
         # Obliczenie błędu na warstwie wyjściowej
@@ -266,7 +269,7 @@ class Net:
             print(f"ACCURACY X = {X} y= {y}")
 
             # outputY = np.array(self.feedforward(X)) * 10
-            outputY = np.array(self.keras_model.predict(X.reshape((-1, 1))))
+            outputY = np.array(self.feedforward(X))
             
             print(f"y = {y} outputY= {outputY}")
 

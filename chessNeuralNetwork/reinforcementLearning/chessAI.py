@@ -23,6 +23,8 @@ class ChessGame():
     show_ui = True
     nr_moves_white = 0
 
+    game_move_nr = 0
+
     def __init__(self, show_ui=False) :
         self.board = chess.Board()
         self.show_ui = show_ui
@@ -87,7 +89,11 @@ class ChessGame():
         moveNew = move + len(self.selected_moves) + 1
         print(f"moveNew={moveNew}")
 
-        self.selected_moves.append(moveNew)
+        self.selected_moves.append(move)
+
+    def revertMove(self, move_val_Y):
+
+        return move_val_Y - len(self.selected_moves) - 1
 
     def createX(self):
         X = []
@@ -209,14 +215,66 @@ class ChessGame():
             return False
         generated_board_points, possible_moves, move_value, values_for_target_field = self.prepare_matrix_points(legal_moves)
         
-        most_quality_legal_move, legal_move_split, DEF_FIGURE = self.generate_and_choose_move(possible_moves, [], self.last_moves_black, values_for_target_field, move_value)
+        # most_quality_legal_move, legal_move_split, DEF_FIGURE = self.generate_and_choose_move(possible_moves, [], self.last_moves_black, values_for_target_field, move_value)
         
+        generated_ai_possible_move = self.revertMove(possible_move)
+
+        field_val, figure_val, figure_idx = (generated_ai_possible_move[0], generated_ai_possible_move[1], generated_ai_possible_move[2])
+        field_val = float(round(field_val, 2))
+        figure_val = float(round(figure_val, 2))
+        figure_idx = int(abs(round(figure_idx, 0)))
+
+        print(f'!!!!game_move_nr {self.game_move_nr}')
+        print(f'!!!!white_move_nr {len(self.selected_moves)}')
+        print(f'!!!!possible_move {possible_move}')
+        print(f'!!!!field_val {field_val} figure_val {figure_val} figure_idx {figure_idx}')
+        print(f'!!!!generated_ai_possible_move {generated_ai_possible_move}')
+        print(f'!!!!values_for_target_field {values_for_target_field}')
+
+
+        if field_val in values_for_target_field:
+            most_val_moves = values_for_target_field[field_val]
+            print(f'!!!!GREAT field_val {field_val}')
+        else :
+            most_val_moves = values_for_target_field[np.max(list(values_for_target_field.keys()))]
+
+            
+
+        if self.is_white_move:
+
+            # if self.nr_moves_white % 5 == 0:
+            if figure_val in most_val_moves:
+                min_figure = figure_val
+                print(f'!!!!GREAT figure_val {figure_val}')
+
+                # min_figure = np.random.choice(list(most_val_moves.keys()))
+            else:
+                min_figure = np.min(list(most_val_moves.keys()))
+            
+            self.nr_moves_white = self.nr_moves_white + 1
+
+
+        legal_random_move_list = most_val_moves[min_figure]
+        if figure_idx < len(legal_random_move_list):
+            legal_random_move_idx = figure_idx
+            print(f'!!!!GREAT figure_idx {figure_idx}/{len(legal_random_move_list)}')
+        else:
+            legal_random_move_idx = random.randint(0, len(legal_random_move_list) - 1)
+        # print( 'len(legal_random_move_list)', len(legal_random_move_list))
+        # print( 'legal_random_move_idx', legal_random_move_idx)
+
+        legal_random_move = legal_random_move_list[legal_random_move_idx]
+        legal_move_split = (legal_random_move['legal_move'][0] + legal_random_move['legal_move'][1], legal_random_move['legal_move'][2] + legal_random_move['legal_move'][3])
+        most_quality_legal_move = legal_random_move
+
+        self.selectMove(legal_random_move['curr_val'], legal_random_move['figure_def_val'], legal_random_move_idx)
+
         # print('last_moves', last_moves)
 
 
         column_move_difference = np.abs(LETTER_MAP.index(legal_move_split[1][0].upper()) - LETTER_MAP.index(legal_move_split[0][0].upper()))
 
-        print('i=' + str(_))
+        print('i=' + str(self.game_move_nr))
         # print('quality_me=' + str(quality_me))
 
         print(legal_move_split[0] + ' -> ' + legal_move_split[1])
@@ -227,10 +285,11 @@ class ChessGame():
         print(self.board, end='\n\n')
         # print(default_board, end='\n\n')
         # print('DEF_FIGURE', DEF_FIGURE)
-
+        DEF_FIGURE = most_quality_legal_move['def_figure']
         self.initPromotionFigureAndCastling(legal_move_split, DEF_FIGURE, column_move_difference)
 
         self.is_white_move = not self.is_white_move
+        self.game_move_nr = self.game_move_nr + 1
 
         # display.update(board.fen())
         # ax.plot(predictedX, predictedY)
@@ -255,9 +314,9 @@ class ChessGame():
 
         column_move_difference = np.abs(LETTER_MAP.index(legal_move_split[1][0].upper()) - LETTER_MAP.index(legal_move_split[0][0].upper()))
 
-        print('column_move_difference=' + str(column_move_difference))
-        print('move_value=' + str(move_value))
-        print('i=' + str(_))
+        # print('column_move_difference=' + str(column_move_difference))
+        # print('move_value=' + str(move_value))
+        # print('i=' + str(self.game_move_nr))
         # print('quality_me=' + str(quality_me))
         # print('quality_enemy=' + str(quality_enemy))
         # print('move_value=' + str(move_value))
@@ -278,6 +337,7 @@ class ChessGame():
         self.initPromotionFigureAndCastling(legal_move_split, DEF_FIGURE, column_move_difference)
 
         self.is_white_move = not self.is_white_move
+        self.game_move_nr = self.game_move_nr + 1
 
         # display.update(board.fen())
         # ax.plot(predictedX, predictedY)
@@ -482,7 +542,7 @@ class ChessGame():
                 curr_val = calc_def_minus_att[targetY][targetX] - figure_def_Val
 
         # =======================================================
-            
+            curr_val = round(curr_val, 2)
             move_values[targetY][targetX].append(curr_val)
 
             if curr_val not in values_for_target_field.keys():

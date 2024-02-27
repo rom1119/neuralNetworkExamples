@@ -68,15 +68,19 @@ class Agent:
 
     def play_me(self, state):
 
-        return self.nn.forward(state)
+        return np.array(self.nn.feedforward(state))
 
-def play_game(agent):
-    chess = ChessGame()
+def play_game(agent, with_ui):
+    chess = ChessGame(with_ui)
 
     play_me = True
     while True:
-        action = agent.select_move(play_me.createX())
+        X = chess.createX()
+        action = agent.play_me(X)[0]
         # state[action] = current_player
+        print(f'!!!!X {X}')
+        print(f'!!!!action {action}')
+
         if play_me:
             me_result = chess.play_me(action)
             if not me_result:
@@ -85,17 +89,10 @@ def play_game(agent):
             enemy_result = chess.play_enemy()
             if not enemy_result:
                 return 1
-        
+        # return
+
         play_me = not play_me
             
-
-# Funkcja sprawdzająca, czy nastąpiła wygrana
-# def check_win(state, player):
-#     win_combinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-#     for comb in win_combinations:
-#         if all(state[i] == player for i in comb):
-#             return True
-#     return False
 
 def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 
@@ -124,11 +121,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
             rewards_sequence.append(reward)
 
             if game_result:
-                # prev_state = states_sequence[-2]
-                # prev_action = actions_sequence[-2]
-                # q_values = agent.nn.forward(prev_state)
-                # max_next_q = np.max(agent.nn.forward(next_state))
-                # q_values[prev_action] += learning_rate * (reward + discount_factor * max_next_q - q_values[prev_action])
+                
                 X = np.array(chessGame.history_boards)
                 Y = np.array(chessGame.selected_moves)
 
@@ -156,15 +149,15 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 # Przykładowe użycie
 if __name__ == "__main__":
     agent = Agent()
-    num_episodes = 2000000
-    train_agent(agent, num_episodes)
+    num_episodes = 1
+    # train_agent(agent, num_episodes)
 
     # # Testowanie agenta
-    # results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
-    # num_tests = 100
-    # for _ in range(num_tests):
-    #     result = play_game(agent)
-    #     results[result] += 1
-
-    # print(f"Wyniki po {num_tests} grach:")
-    # print(f"Wygrane:
+    results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
+    num_tests = 10
+    for _ in range(num_tests):
+        result = play_game(agent, True)
+        results[result] += 1
+    print(f"Wyniki po {num_tests} grach:")
+    print(f"Wygrane: {results[1]}")
+    print(f"Przegrane: {results[0]}")
