@@ -228,45 +228,45 @@ class Net:
         #     print(output)
         #     print(f"FINAL ===============  =====Epoka: {epoch}, Strata: {loss}")
 
-        print(f"CHECK ACCURACY ===============  ====")
+        # print(f"CHECK ACCURACY ===============  ====")
 
-        for i in range(len(XList)):
-            X = XList[i]
-            y = YList[i].tolist()
-            # print(f"ACCURACY X =")
-            # print(f"{X.reshape(8,8)}")
+        # for i in range(len(XList)):
+        #     X = XList[i]
+        #     y = YList[i].tolist()
+        #     # print(f"ACCURACY X =")
+        #     # print(f"{X.reshape(8,8)}")
 
-            y_move_idx = YList[i][len(YList[i]) - 1]
-            y_def_figure = YList[i][len(YList[i]) - 2]
+        #     y_move_idx = YList[i][len(YList[i]) - 1]
+        #     y_def_figure = YList[i][len(YList[i]) - 2]
 
-            del y[len(y) - 1]
-            del y[len(y) - 1]
+        #     del y[len(y) - 1]
+        #     del y[len(y) - 1]
             
-            y = np.array(y)
-            y = y.reshape(8,8)
+        #     y = np.array(y)
+        #     y = y.reshape(8,8)
 
-            # print(f"y ")
-            # print(f"{y} ")
-            # print(f"y_move_idx ")
-            # print(f"{y_move_idx} ")
-            # print(f"y_def_figure ")
-            # print(f"{y_def_figure} ")
+        #     # print(f"y ")
+        #     # print(f"{y} ")
+        #     # print(f"y_move_idx ")
+        #     # print(f"{y_move_idx} ")
+        #     # print(f"y_def_figure ")
+        #     # print(f"{y_def_figure} ")
 
-            # outputY = np.array(self.feedforward(X)) * 10
-            predict = np.array(self.feedforward(X)[0]).tolist()
+        #     # outputY = np.array(self.feedforward(X)) * 10
+        #     predict = np.array(self.feedforward(X)[0]).tolist()
 
-            predict_y_move_idx = np.round(predict[len(predict) - 1], 1) * 10
-            predict_y_def_figure = trunc(np.round(predict[len(predict) - 2], 3), 2)
+        #     predict_y_move_idx = np.round(predict[len(predict) - 1], 1) * 10
+        #     predict_y_def_figure = trunc(np.round(predict[len(predict) - 2], 3), 2)
 
-            # print(f"predict bef DEL= {predict}")
-            del predict[len(predict) - 1]
-            # print(f"predict AF DEL= {predict}")
-            del predict[len(predict) - 1]
+        #     # print(f"predict bef DEL= {predict}")
+        #     del predict[len(predict) - 1]
+        #     # print(f"predict AF DEL= {predict}")
+        #     del predict[len(predict) - 1]
 
-            predict = np.array(predict)
-            outputY = np.round(predict.reshape(8,8),2)
+        #     predict = np.array(predict)
+        #     outputY = np.round(predict.reshape(8,8),2)
 
-            outputY = trunc(outputY, 1)
+        #     outputY = trunc(outputY, 1)
             # outputY = np.array(self.feedforward(X)).reshape(8,8)
             
 

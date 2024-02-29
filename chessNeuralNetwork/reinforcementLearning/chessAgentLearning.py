@@ -99,6 +99,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
     for episode in range(num_episodes):
 
         rewards_sequence = []
+        print(f"GAME NR {episode} ")
 
         while True:
             # states_sequence.append(state.copy())
