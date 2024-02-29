@@ -430,7 +430,7 @@ class ChessGame():
             # print('quality_enemy=' + str(quality_enemy))
             # print('move_value=' + str(move_value))
             # print('is_white_move=' + str(is_white_move))
-            print(legal_move_split[0] + ' -> ' + legal_move_split[1])
+            # print(legal_move_split[0] + ' -> ' + legal_move_split[1])
 
             self.default_board = self.move(legal_move_split[0], legal_move_split[1], default_board)
             self.board.push_san(most_quality_legal_move['legal_move'] )
