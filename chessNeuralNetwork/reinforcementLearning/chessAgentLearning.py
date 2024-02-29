@@ -66,7 +66,7 @@ class Agent:
         # joblib.dump(self.nn, "./model/chess_model.joblib")
 
 
-    def play_me(self, state):
+    def select_action(self, state):
 
         return np.array(self.nn.feedforward(state))
 
@@ -76,7 +76,7 @@ def play_game(agent, with_ui):
     play_me = True
     while True:
         X = chess.createX()
-        action = agent.play_me(X)[0]
+        action = agent.select_action(X)
         # state[action] = current_player
         print(f'!!!!X {X}')
         print(f'!!!!action {action}')
@@ -138,8 +138,6 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                # joblib.dump(agent.nn, "./model/chess_model.joblib")
-
             # state = next_state
 
             if reward != 0:
@@ -149,15 +147,15 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 # Przykładowe użycie
 if __name__ == "__main__":
     agent = Agent()
-    num_episodes = 1
-    # train_agent(agent, num_episodes)
+    num_episodes = 9999999999
+    train_agent(agent, num_episodes)
 
     # # Testowanie agenta
     results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
-    num_tests = 10
-    for _ in range(num_tests):
-        result = play_game(agent, True)
-        results[result] += 1
+    num_tests = 1
+    # for _ in range(num_tests):
+    #     result = play_game(agent, True)
+    #     results[result] += 1
     print(f"Wyniki po {num_tests} grach:")
     print(f"Wygrane: {results[1]}")
     print(f"Przegrane: {results[0]}")

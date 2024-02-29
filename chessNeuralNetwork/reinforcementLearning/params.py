@@ -13,9 +13,9 @@ DIGIT_MAP.reverse()
 DIGIT_MAP_NOT_REV = ['1', '2', '3', '4', '5', '6', '7', '8']
 
 FIGURE_VALUES_ENEMY = {
-    'r': 0.3,
+    'r': 0.4,
     'n': 0.25,
-    'b': 0.25,
+    'b': 0.3,
     'q': 0.6,
     'k': 0.9,
     'p': 0.1,
@@ -23,9 +23,9 @@ FIGURE_VALUES_ENEMY = {
 
 
 FIGURE_VALUES_TO_ATTACK = {
-    'r': 3,
+    'r': 4,
     'n': 2,
-    'b': 2,
+    'b': 3,
     'q': 6,
     'k': 9,
     'p': 1,
