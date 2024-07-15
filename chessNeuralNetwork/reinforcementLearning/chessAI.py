@@ -81,7 +81,7 @@ class ChessGame():
     def revertMove(self, predict):
         Y = np.array(predict[0]).tolist()
 
-        predict_y_def_figure = trunc(np.round(Y[len(Y) - 2], 3), 2)
+        predict_y_def_figure = trunc(np.round(Y[len(Y) - 2], 1), 1)
         predict_y_move_idx = np.round(Y[len(Y) - 1], 1) * 10
 
         del Y[len(Y) - 1]
@@ -228,17 +228,18 @@ class ChessGame():
         # field_val = float(round(field_val, 2))
         # figure_val = float(round(figure_val, 2))
         # figure_idx = int(abs(round(figure_idx, 0)))
-
+        if figure_def_val == 0.2:
+            figure_def_val = 0.25
         print(f'!!!!game_move_nr {self.game_move_nr}', end='\n\n')
         print(f'!!!!white_move_nr {len(self.selected_moves)}',end='\n\n')
-        print(f'!!!!possible_move {possible_move}',end='\n\n')
+        # print(f'!!!!possible_move {possible_move}',end='\n\n')
         print(f'!!!!figure_def_val {figure_def_val} figure_idx {figure_idx}',end='\n\n')
-        print(f'!!!!field_val_map {field_val_map.tolist()}',end='\n\n')
-        print(f'!!!!values_for_target_field {values_for_target_field}',end='\n\n')
+        # print(f'!!!!field_val_map {field_val_map.tolist()}',end='\n\n')
+        # print(f'!!!!values_for_target_field {values_for_target_field}',end='\n\n')
 
         field_val = 9999
         # while True:
-
+        field_val_map[field_val_map < 0] = 0
         tmp_map = field_val_map.reshape(64)
 
         ind = np.argpartition(tmp_map, -15)[-15:]
@@ -255,17 +256,18 @@ class ChessGame():
                     selected_coords = f"cord_y {cord_y} cord_x {X_cords[idx_cord]}"
                     break
 
-        print(f'!!!!field_val_map {field_val_map}',end='\n\n')
+        # print(f'!!!!field_val_map {field_val_map}',end='\n\n')
 
-        print(f"current_board_for_y {self.current_board_for_y}")
-        print(f"selected field_val {field_val} selected_coords {selected_coords}")
+        # print(f"current_board_for_y {self.current_board_for_y}")
+        # print(f"selected field_val {field_val} selected_coords {selected_coords}")
+        
         if field_val in values_for_target_field:
             most_val_moves = values_for_target_field[field_val]
             print(f'!!!!GREAT field_val {field_val}')
         else :
             most_val_moves = values_for_target_field[np.max(list(values_for_target_field.keys()))]
 
-        print(f'!!!!most_val_moves {most_val_moves}',end='\n\n')
+        # print(f'!!!!most_val_moves {most_val_moves}',end='\n\n')
 
             
 
@@ -283,7 +285,7 @@ class ChessGame():
 
 
         legal_random_move_list = most_val_moves[min_figure]
-        print(f'!!!!legal_random_move_list {legal_random_move_list}')
+        # print(f'!!!!legal_random_move_list {legal_random_move_list}')
 
         if figure_idx > len(legal_random_move_list) - 1:
             legal_random_move_idx = len(legal_random_move_list) - 1
@@ -581,11 +583,11 @@ class ChessGame():
             # curr_val = attack_figure_val - attack_calc[targetY][targetX] - figure_def_Val
             # print(f"calc_white[targetY][targetX] {calc_white[targetY][targetX]}")
 
-            if self.is_white_move:
-                curr_val = calc_white[targetY][targetX] - figure_def_Val + 3
-                self.current_board_for_y[targetY][targetX] = curr_val
-            else:
-                curr_val = calc_def_minus_att[targetY][targetX] - figure_def_Val
+            curr_val = calc_white[targetY][targetX] - figure_def_Val + 3
+            self.current_board_for_y[targetY][targetX] = curr_val
+            # if self.is_white_move:
+            # else:
+            #     curr_val = calc_def_minus_att[targetY][targetX] - figure_def_Val
 
         # =======================================================
             curr_val = round(curr_val, 3)

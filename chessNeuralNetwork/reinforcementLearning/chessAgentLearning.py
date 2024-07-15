@@ -78,8 +78,8 @@ def play_game(agent, with_ui):
         X = chess.createX()
         action = agent.select_action(X)
         # state[action] = current_player
-        print(f'!!!!X {X}')
-        print(f'!!!!action {action}')
+        # print(f'!!!!X {X}')
+        # print(f'!!!!action {action}')
 
         if play_me:
             me_result = chess.play_me(action)
@@ -149,14 +149,14 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 if __name__ == "__main__":
     agent = Agent()
     num_episodes = 9999999999
-    train_agent(agent, num_episodes)
+    # train_agent(agent, num_episodes)
 
     # # Testowanie agenta
     results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
     num_tests = 1
-    # for _ in range(num_tests):
-    #     result = play_game(agent, True)
-    #     results[result] += 1
+    for _ in range(num_tests):
+        result = play_game(agent, True)
+        results[result] += 1
     print(f"Wyniki po {num_tests} grach:")
     print(f"Wygrane: {results[1]}")
     print(f"Przegrane: {results[0]}")

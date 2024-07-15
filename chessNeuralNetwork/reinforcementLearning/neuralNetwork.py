@@ -129,7 +129,6 @@ class Net:
             # self.output_bias = params['output_bias']
             # self.keras_model = keras.models.load_model("model/chess_model_not_norm.model")
             self.keras_model = keras.models.load_model("model/chess_modelv2.model")
-            pass
         except: 
             print('not  model params found')
 
@@ -146,22 +145,7 @@ class Net:
         self.keras_model.save("model/chess_modelv2.model")
         # self.keras_model.save("model/chess_model_not_norm.model")
 
-        
-    def tanh(self, x):
-        return np.tanh(x)
-        
-    def tanh_derivative(self, x):
-        return (1 - (np.tanh(x) ** 2))
-
     def feedforward(self, X):
-        # Propagacja sygnału w przód
-        # hidden_output = X
-        # self.hidden_outputs = [hidden_output]  # Przechowywanie wyników na warstwach ukrytych
-        # for i in range(len(self.hidden_weights)):
-        #     hidden_output = self.tanh(np.dot(hidden_output, self.hidden_weights[i]) + self.hidden_biases[i])
-        #     self.hidden_outputs.append(hidden_output)
-        # output = np.dot(hidden_output, self.output_weights) + self.output_bias
-        # return output
         return self.keras_model.predict(np.array([X]))
 
     def learnNetwork(self, XArg, yArg):
