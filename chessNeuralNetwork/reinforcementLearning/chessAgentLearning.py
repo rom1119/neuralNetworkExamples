@@ -126,8 +126,14 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
                 X = np.array(chessGame.history_boards)
                 Y = np.array(chessGame.selected_moves)
 
-                # print(X.shape)
-                # print(Y.shape)
+                print('X.shape', X.shape)
+                print('Y.shape', Y.shape)
+                print('X', X[0].reshape(8,8))
+                y = Y[0]
+                y = np.delete(y, len(y) - 1)
+                y = np.delete(y, len(y) - 1)
+
+                print('Y', y.reshape(8,8))
                 # for i in range(len(X)):
                 #     print(Y[i])
                 #     print(X[i])
@@ -136,7 +142,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
                 start_time = time.time()
 
                 agent.nn.learnNetwork(X, Y)
-
+                break
                 print("--- %s seconds ---" % (time.time() - start_time))
 
             # state = next_state
@@ -149,7 +155,7 @@ def train_agent(agent, num_episodes, learning_rate=0.01, discount_factor=0.99):
 if __name__ == "__main__":
     agent = Agent()
     num_episodes = 9999999999
-    # train_agent(agent, num_episodes)
+    train_agent(agent, num_episodes)
 
     # # Testowanie agenta
     results = {1: 0, 0: 0}  # Wyniki: 1 - wygrana, -1 - przegrana, 0 - remis
